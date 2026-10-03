@@ -9,7 +9,7 @@
     <style>
         /* Estilos DUA: Alto contraste y accesibilidad visual */
         body { 
-            background-color: #0F172A; /* Fondo oscuro para evitar fatiga visual */
+            background-color: #0F172A; 
             color: #F8FAFC; 
             font-family: system-ui, -apple-system, sans-serif;
         }
@@ -180,7 +180,7 @@
                 ]
             },
             {
-                origen: "🖐️️ Señal: Gotas en mano/metal",
+                origen: "🖐 Señal: Gotas en mano/metal",
                 destinoCorrecto: "Producto Corrosivo. Destruye la piel, los tejidos y los metales.",
                 opcionesDestino: [
                     "Producto Corrosivo. Destruye la piel, los tejidos y los metales.",
@@ -331,4 +331,3 @@
     </script>
 </body>
 </html>
-
