@@ -1,1 +1,337 @@
-# Adri-
+Como desarrollador experto en aplicaciones web educativas, he programado la aplicación basándome en las mejores prácticas de tu documento TALLER IA EDUCACIÓN.
+Para cumplir con los criterios inclusivos y curriculares, la herramienta está desarrollada en un único archivo HTML utilizando Tailwind CSS. Aplicando estrictamente los principios del Diseño Universal para el Aprendizaje (DUA), he integrado alto contraste, tipografías grandes e iconos visuales de apoyo. Además, para evitar la sobrecarga cognitiva en alumnos con TDAH, la navegación es paso a paso (un reto por pantalla) y cuenta con refuerzo multisensorial a través de la Web Audio API para emitir sonidos de acierto o error.
+Guarda el siguiente código en un archivo llamado laboratorio_eso.html y ábrelo en cualquier navegador web:
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio y Seguridad - 3º ESO</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos DUA: Alto contraste y accesibilidad visual */
+        body { 
+            background-color: #0F172A; /* Fondo oscuro para evitar fatiga visual */
+            color: #F8FAFC; 
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .btn-dua {
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .btn-dua:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: none !important;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .selected-item {
+            border-color: #38BDF8 !important;
+            background-color: #0C4A6E !important;
+            box-shadow: 0 0 0 4px #BAE6FD;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Contenedor Principal -->
+    <main class="w-full max-w-3xl bg-slate-900 rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-sky-400">
+        
+        <!-- Pantalla de Inicio -->
+        <section id="start-screen" class="text-center fade-in">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-6 text-sky-300 leading-tight">
+                🧪 Reto de Laboratorio: Instrumentos y Peligros
+            </h1>
+            <p class="text-2xl mb-8 font-medium text-slate-200">
+                Aprende el material de laboratorio y las señales de seguridad de Física y Química.
+            </p>
+            <div class="flex justify-center bg-slate-800 border-2 border-sky-400 rounded-2xl p-4 mb-8">
+                <p class="text-xl font-bold flex items-center gap-3 text-left text-sky-200">
+                    <span>💡</span> Toca la imagen o el nombre de la izquierda y únelo con su definición a la derecha.
+                </p>
+            </div>
+            <button onclick="iniciarJuego()" class="btn-dua w-full bg-sky-500 hover:bg-sky-400 border-b-8 border-sky-700 text-slate-950 text-3xl font-extrabold py-5 px-8 rounded-2xl flex items-center justify-center gap-4 focus:outline-none focus:ring-4 focus:ring-white">
+                <span>▶️</span> COMENZAR RETO
+            </button>
+        </section>
+
+        <!-- Pantalla de Juego (Unir parejas paso a paso) -->
+        <section id="game-screen" class="hidden text-center">
+            <!-- Indicador de progreso -->
+            <div class="flex justify-between items-center mb-6 border-b-4 border-slate-700 pb-4">
+                <span class="text-2xl font-bold text-sky-300">Paso <span id="current-step">1</span> de <span id="total-steps">6</span></span>
+                <span class="text-2xl font-bold bg-sky-500 text-slate-950 px-4 py-1 rounded-xl">⭐ <span id="score">0</span> pts</span>
+            </div>
+
+            <p class="text-2xl font-semibold mb-6 text-sky-100">
+                Une el elemento con su función o significado correcto:
+            </p>
+
+            <!-- Panel de Unir Parejas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Columna Origen -->
+                <div id="origins-container" class="flex flex-col gap-4">
+                    <!-- Generado por JS -->
+                </div>
+                <!-- Columna Destinos (Mezclados) -->
+                <div id="destinations-container" class="flex flex-col gap-4">
+                    <!-- Generado por JS -->
+                </div>
+            </div>
+
+            <!-- Feedback Visual -->
+            <div id="feedback-container" class="hidden rounded-2xl p-4 mb-4 border-4">
+                <p id="feedback-text" class="text-2xl font-extrabold flex items-center justify-center gap-3"></p>
+            </div>
+
+            <!-- Botón Siguiente -->
+            <button id="next-btn" onclick="siguienteReto()" class="hidden btn-dua w-full bg-yellow-400 hover:bg-yellow-300 border-b-8 border-yellow-600 text-slate-950 text-3xl font-bold py-4 px-8 rounded-2xl flex items-center justify-center gap-4 focus:outline-none focus:ring-4 focus:ring-white">
+                <span>Siguiente Paso</span> <span>⏭️</span>
+            </button>
+        </section>
+
+        <!-- Pantalla de Resultados -->
+        <section id="result-screen" class="hidden text-center fade-in">
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-6 text-sky-300">🏁 ¡Práctica de Laboratorio Completada!</h2>
+            <p class="text-3xl mb-8">Puntuación final:</p>
+            <div class="inline-block bg-sky-500 border-4 border-white rounded-full w-40 h-40 flex items-center justify-center mx-auto mb-8 shadow-lg">
+                <span class="text-6xl font-black text-slate-950" id="final-score">0</span>
+            </div>
+            <p class="text-2xl font-bold mb-8 text-sky-200" id="final-message"></p>
+            
+            <button onclick="reiniciarJuego()" class="btn-dua w-full bg-emerald-400 hover:bg-emerald-300 border-b-8 border-emerald-600 text-slate-950 text-3xl font-extrabold py-5 px-8 rounded-2xl flex items-center justify-center gap-4 focus:outline-none focus:ring-4 focus:ring-white">
+                <span>🔄</span> REPETIR PRÁCTICA
+            </button>
+        </section>
+
+    </main>
+
+    <script>
+        // Web Audio API nativa para sonidos inmediatos y accesibles (TDAH / DUA)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'success') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            }
+        }
+
+        // Datos del juego paso a paso para evitar sobrecarga (3º ESO)
+        const retos = [
+            {
+                origen: "🧪 Probeta",
+                destinoCorrecto: "Tubo cilíndrico para medir volúmenes de líquidos con precisión.",
+                opcionesDestino: [
+                    "Tubo cilíndrico para medir volúmenes de líquidos con precisión.",
+                    "Recipiente de vidrio utilizado exclusivamente para calentar gases."
+                ]
+            },
+            {
+                origen: "⚗️ Matraz Erlenmeyer",
+                destinoCorrecto: "Recipiente cónico ideal para agitar y mezclar líquidos sin derramar.",
+                opcionesDestino: [
+                    "Recipiente cónico ideal para agitar y mezclar líquidos sin derramar.",
+                    "Instrumento para observar bacterias muy pequeñas."
+                ]
+            },
+            {
+                origen: "☠️ Señal: Calavera",
+                destinoCorrecto: "Producto Tóxico. Puede causar la muerte por ingestión o inhalación.",
+                opcionesDestino: [
+                    "Peligro para el medio ambiente acuático.",
+                    "Producto Tóxico. Puede causar la muerte por ingestión o inhalación."
+                ]
+            },
+            {
+                origen: "🔥 Señal: Llama",
+                destinoCorrecto: "Producto Inflamable. Arde con facilidad cerca del calor o chispas.",
+                opcionesDestino: [
+                    "Producto Inflamable. Arde con facilidad cerca del calor o chispas.",
+                    "Sustancia que congela las superficies rápidamente."
+                ]
+            },
+            {
+                origen: "🖐️️ Señal: Gotas en mano/metal",
+                destinoCorrecto: "Producto Corrosivo. Destruye la piel, los tejidos y los metales.",
+                opcionesDestino: [
+                    "Producto Corrosivo. Destruye la piel, los tejidos y los metales.",
+                    "Indica que debes lavarte las manos con agua caliente."
+                ]
+            },
+            {
+                origen: "💧 Pipeta",
+                destinoCorrecto: "Tubo delgado para medir y transferir volúmenes de líquido muy pequeños.",
+                opcionesDestino: [
+                    "Báscula para pesar sólidos en polvo.",
+                    "Tubo delgado para medir y transferir volúmenes de líquido muy pequeños."
+                ]
+            }
+        ];
+
+        let indiceActual = 0;
+        let puntuacion = 0;
+        let origenSeleccionado = false;
+
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const originsContainer = document.getElementById('origins-container');
+        const destinationsContainer = document.getElementById('destinations-container');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const feedbackText = document.getElementById('feedback-text');
+        const nextBtn = document.getElementById('next-btn');
+        const scoreElement = document.getElementById('score');
+        const currentStepElement = document.getElementById('current-step');
+        const totalStepsElement = document.getElementById('total-steps');
+
+        function iniciarJuego() {
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            indiceActual = 0;
+            puntuacion = 0;
+            actualizarPuntuacion();
+            mostrarReto();
+        }
+
+        function mostrarReto() {
+            feedbackContainer.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            originsContainer.innerHTML = '';
+            destinationsContainer.innerHTML = '';
+            origenSeleccionado = false;
+
+            const retoActual = retos[indiceActual];
+            currentStepElement.textContent = indiceActual + 1;
+
+            // Renderizar Origen (Instrumento / Pictograma)
+            const origenDiv = document.createElement('div');
+            origenDiv.className = "btn-dua bg-slate-800 border-4 border-slate-600 text-sky-300 text-3xl font-black p-8 rounded-2xl flex items-center justify-center cursor-pointer shadow-md text-center";
+            origenDiv.textContent = retoActual.origen;
+            origenDiv.onclick = () => seleccionarOrigen(origenDiv);
+            originsContainer.appendChild(origenDiv);
+
+            // Renderizar Destinos Mezclados
+            const destinosMezclados = [...retoActual.opcionesDestino].sort(() => Math.random() - 0.5);
+            destinosMezclados.forEach(destino => {
+                const destBtn = document.createElement('button');
+                destBtn.className = "btn-dua w-full bg-slate-800 border-4 border-slate-600 hover:border-sky-400 text-white text-xl font-bold py-6 px-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-400 shadow-md text-left transition-colors";
+                destBtn.textContent = destino;
+                destBtn.onclick = () => verificarUnificacion(destino, destBtn);
+                destinationsContainer.appendChild(destBtn);
+            });
+        }
+
+        function seleccionarOrigen(div) {
+            playSound('click');
+            originsContainer.querySelectorAll('div').forEach(d => d.classList.remove('selected-item'));
+            div.classList.add('selected-item');
+            origenSeleccionado = true;
+        }
+
+        function verificarUnificacion(destinoSeleccionado, btnDestino) {
+            if (!origenSeleccionado) {
+                alert("¡💡 Recuerda! Selecciona primero el recuadro de la izquierda.");
+                return;
+            }
+
+            const retoActual = retos[indiceActual];
+            const botonesDestino = destinationsContainer.querySelectorAll('button');
+            botonesDestino.forEach(b => b.disabled = true);
+
+            feedbackContainer.classList.remove('hidden');
+            feedbackContainer.classList.add('fade-in');
+
+            if (destinoSeleccionado === retoActual.destinoCorrecto) {
+                puntuacion += 10;
+                actualizarPuntuacion();
+                playSound('success');
+                
+                btnDestino.classList.replace('border-slate-600', 'border-emerald-400');
+                btnDestino.classList.add('bg-emerald-950');
+
+                feedbackContainer.className = 'rounded-2xl p-5 mb-4 border-4 border-emerald-400 bg-emerald-950 fade-in';
+                feedbackText.className = 'text-2xl font-extrabold flex items-center justify-center gap-3 text-emerald-300';
+                feedbackText.innerHTML = '<span>✅</span> ¡Excelente! Definición correcta.';
+            } else {
+                playSound('error');
+                
+                btnDestino.classList.replace('border-slate-600', 'border-rose-500');
+                btnDestino.classList.add('bg-rose-950');
+
+                feedbackContainer.className = 'rounded-2xl p-5 mb-4 border-4 border-rose-500 bg-rose-950 fade-in';
+                feedbackText.className = 'text-2xl font-extrabold flex items-center justify-center gap-3 text-rose-300';
+                feedbackText.innerHTML = '<span>❌</span> ¡Atención! Repasa la función de este elemento.';
+            }
+
+            nextBtn.classList.remove('hidden');
+            nextBtn.classList.add('fade-in');
+        }
+
+        function siguienteReto() {
+            indiceActual++;
+            if (indiceActual < retos.length) {
+                mostrarReto();
+            } else {
+                mostrarResultados();
+            }
+        }
+
+        function mostrarResultados() {
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            document.getElementById('final-score').textContent = puntuacion;
+            
+            const mensajeFinal = document.getElementById('final-message');
+            if (puntuacion === 60) {
+                mensajeFinal.textContent = "🏆 ¡Científico experto! Puedes entrar seguro al laboratorio.";
+            } else if (puntuacion >= 30) {
+                mensajeFinal.textContent = "👍 ¡Buen trabajo! Pero ten cuidado con algunos químicos.";
+            } else {
+                mensajeFinal.textContent = "⚠️ ¡Peligro! Debes repasar la teoría antes de hacer experimentos.";
+            }
+        }
+
+        function reiniciarJuego() {
+            resultScreen.classList.add('hidden');
+            iniciarJuego();
+        }
+        
+        function actualizarPuntuacion() {
+            scoreElement.textContent = puntuacion;
+        }
+    </script>
+</body>
+</html>
+
