@@ -1,6 +1,3 @@
-Como desarrollador experto en aplicaciones web educativas, he programado la aplicación basándome en las mejores prácticas de tu documento TALLER IA EDUCACIÓN.
-Para cumplir con los criterios inclusivos y curriculares, la herramienta está desarrollada en un único archivo HTML utilizando Tailwind CSS. Aplicando estrictamente los principios del Diseño Universal para el Aprendizaje (DUA), he integrado alto contraste, tipografías grandes e iconos visuales de apoyo. Además, para evitar la sobrecarga cognitiva en alumnos con TDAH, la navegación es paso a paso (un reto por pantalla) y cuenta con refuerzo multisensorial a través de la Web Audio API para emitir sonidos de acierto o error.
-Guarda el siguiente código en un archivo llamado laboratorio_eso.html y ábrelo en cualquier navegador web:
 <!DOCTYPE html>
 <html lang="es">
 <head>
